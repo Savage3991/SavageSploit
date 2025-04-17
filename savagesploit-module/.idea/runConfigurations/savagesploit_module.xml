@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="savagesploit_module" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="$CMakeCurrentLocalBuildDir$/savagesploit_module.dll" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="savagesploit_module" TARGET_NAME="savagesploit_module" CONFIG_NAME="Release-Visual Studio" RUN_PATH="$PROJECT_DIR$/../savagesploit-injector/cmake-build-release-visual-studio/savagesploit_injector.exe">
+    <method v="2">
+      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+    </method>
+  </configuration>
+</component>
