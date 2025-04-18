@@ -12,4 +12,22 @@ add_compile_options(
         /arch:AVX2
 )
 
-add_library(${PROJECT_NAME} SHARED entry.cpp)
+add_library(${PROJECT_NAME} SHARED entry.cpp
+        src/core/execution/execution.cpp
+        src/core/execution/execution.h
+        src/rbx/engine/game.h
+        src/rbx/engine/luau.h
+        src/rbx/engine/hyperion.h
+        src/rbx/taskscheduler/taskscheduler.cpp
+        src/rbx/taskscheduler/taskscheduler.h
+        src/rbx/engine/game_structures.h
+        globals.h
+        entry.h)
+
+# DEPENDENCIES
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/dependencies")
+
+## LUAU
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/luau")
+target_link_libraries(${PROJECT_NAME} PUBLIC Luau.Compiler Luau.Ast Luau.VM Luau.VM.Internals)
