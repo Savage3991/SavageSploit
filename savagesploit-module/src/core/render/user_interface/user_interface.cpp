@@ -3,3 +3,11 @@
 //
 
 #include "user_interface.h"
+
+#include "imgui.h"
+
+void user_interface::render() {
+    ImGui::Begin("Hello");
+
+    ImGui::End();
+}

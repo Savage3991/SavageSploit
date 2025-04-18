@@ -42,6 +42,12 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/luau")
 target_link_libraries(${PROJECT_NAME} PUBLIC Luau.Compiler Luau.Ast Luau.VM Luau.VM.Internals)
 
 ## IMGUI
-
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/imgui")
 target_link_libraries(${PROJECT_NAME} PUBLIC Imgui)
+
+## OPENSSL
+#find_package(OpenSSL CONFIG REQUIRED)
+
+## IXWEBSOCKET
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/ixwebsocket")
+target_link_libraries(${PROJECT_NAME} PUBLIC ixwebsocket Ws2_32.lib)

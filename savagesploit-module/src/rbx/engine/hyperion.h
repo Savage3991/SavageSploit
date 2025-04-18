@@ -16,10 +16,10 @@ namespace rbx::hyperion {
         if (address == nullptr)
             return;
 
-        const auto Current = *reinterpret_cast<uint8_t*>(*rebase_hyp<uintptr_t*>(0x2a2df0) + ((uintptr_t)address >> 0x13));
+        const auto Current = *reinterpret_cast<uint8_t*>(*rebase_hyp<uintptr_t*>(0x29a0e0) + ((uintptr_t)address >> 0x13));
         if (Current != 0xFF)
         {
-            *reinterpret_cast<uint8_t*>(*rebase_hyp<uintptr_t*>(0x2a2df0) + ((uintptr_t)address >> 0x13)) = 0xFF;
+            *reinterpret_cast<uint8_t*>(*rebase_hyp<uintptr_t*>(0x29a0e0) + ((uintptr_t)address >> 0x13)) = 0xFF;
         }
     }
 }

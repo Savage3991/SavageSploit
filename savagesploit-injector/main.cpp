@@ -713,12 +713,12 @@ namespace Types {
 //constexpr uint64_t Offset_InsertSet = 0x14EFF90;
 //constexpr uint64_t Offset_WhitelistedPages = 0x256C50;
 
-constexpr uint64_t kPageHash = 0x90dd36fed8ea4ff4; // Changes
+constexpr uint64_t kPageHash = 0x84b3a57d90e73527; // Changes
 constexpr uint64_t kPageMask = 0xfffffffffffff000;
 constexpr uint8_t kPageShift = 0xc;
 
-constexpr uint64_t Offset_InsertSet = 0xCEA020;
-constexpr uint64_t Offset_WhitelistedPages = 0x2D3A48;
+constexpr uint64_t Offset_InsertSet = 0xc43d00;
+constexpr uint64_t Offset_WhitelistedPages = 0x29c758;
 
 
 #define RELOC_FLAG(RelInfo) ((RelInfo >> 0x0C) == IMAGE_REL_BASED_DIR64)
