@@ -22,7 +22,12 @@ add_library(${PROJECT_NAME} SHARED entry.cpp
         src/rbx/taskscheduler/taskscheduler.h
         src/rbx/engine/game_structures.h
         globals.h
-        entry.h)
+        entry.h
+        src/core/environment/environment.cpp
+        src/core/environment/environment.h
+        src/core/environment/libs/http.cpp
+        src/core/environment/libs/misc.cpp
+        src/core/environment/libs/closure.cpp)
 
 # DEPENDENCIES
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
