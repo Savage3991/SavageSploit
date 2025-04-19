@@ -6,8 +6,16 @@
 
 #include "imgui.h"
 
-void user_interface::render() {
-    ImGui::Begin("Hello");
+//#include "TextEditor.h"
 
-    ImGui::End();
+//TextEditor editor;
+
+void user_interface::render() {
+
+    if (ImGui::Begin("SavageSploit | 100% Real.")) {
+       // auto lang = TextEditor::LanguageDefinition::Lua();
+       // editor.Render("TextEditor");
+
+        ImGui::End();
+    }
 }

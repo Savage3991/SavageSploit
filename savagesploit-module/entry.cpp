@@ -3,7 +3,6 @@
 #include "globals.h"
 #include "lstate.h"
 #include "lualib.h"
-#include "Windows.h"
 #include "thread"
 #include "src/core/environment/environment.h"
 #include "src/core/execution/execution.h"
@@ -12,6 +11,8 @@
 #include "src/rbx/engine/game.h"
 #include "src/rbx/engine/hyperion.h"
 #include "src/rbx/taskscheduler/taskscheduler.h"
+
+
 
 // CXX EXCEPTION SUPPORT
 namespace exceptions {
@@ -82,18 +83,16 @@ void entry_point::entry(HMODULE DllModule) {
 
     rbx::standard_out::printf(rbx::message_type::message_info, "our_state: %p", our_state);
 
-//    g_execution->run_code(our_state, "print('helloooooo')");
+    rbx::hyperion::add_to_cfg((void*)taskscheduler::initialize_hook);
+    rbx::hyperion::add_to_cfg((void*)renderer::initialize);
 
-    rbx::hyperion::add_to_cfg((void*)g_taskscheduler->initialize_hook);
-    rbx::hyperion::add_to_cfg((void*)g_render->initialize);
+    taskscheduler::initialize_hook();
 
-    g_taskscheduler->initialize_hook();
-
-    g_environment->initialize(our_state);
+    environment::initialize(our_state);
 
     g_taskscheduler->queue_script("print('hello ma niggers')");
 
-    //g_render->initialize();
+    renderer::initialize();
 
     g_taskscheduler->queue_script("printidentity()");
     g_taskscheduler->queue_script("print(identifyexecutor())");

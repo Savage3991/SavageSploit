@@ -8,5 +8,5 @@
 
 class entry_point {
 public:
-    void entry(HMODULE DllModule);
+    inline void entry(HMODULE DllModule);
 };

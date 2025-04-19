@@ -1,67 +1,76 @@
-//
-// Created by savage on 18.04.2025.
-//
-
 #include "render.h"
-
-#include <mutex>
-
-#include "src/rbx/engine/game.h"
-#include "src/rbx/taskscheduler/taskscheduler.h"
+#include "../../rbx/taskscheduler/taskscheduler.h"
 #include "user_interface/user_interface.h"
+
+HWND renderer::windowhandle = nullptr;
+IDXGISwapChain* renderer::swapchain = nullptr;
+ID3D11Device* renderer::device = nullptr;
+ID3D11DeviceContext* renderer::devicecontext = nullptr;
+ID3D11RenderTargetView* renderer::rendertargetview = nullptr;
+ID3D11Texture2D* renderer::backbuffer = nullptr;
+
+renderer::presentfn renderer::originalpresent = nullptr;
+renderer::resizebuffersfn renderer::originalresizebuffers = nullptr;
+WNDPROC renderer::originalwindowproc = nullptr;
+
+float renderer::dpi_scale = 0;
+bool renderer::test = false;
+
+ImFont* renderer::System = nullptr;
+ImFont* renderer::Plex = nullptr;
+ImFont* renderer::Monospace = nullptr;
+ImFont* renderer::Ui = nullptr;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-void render::initialize() {
+void renderer::initialize() {
     uintptr_t renderjob = g_taskscheduler->get_job_by_name("RenderJob");
     if (!renderjob)
         return;
 
-    rbx::standard_out::printf(rbx::message_type::message_info, "renderjob: %p", renderjob);
-
     uintptr_t viewbase = *(uintptr_t*)(renderjob + 0x218);
     uintptr_t deviceaddr = *(uintptr_t*)(viewbase + 0x8);
 
-    g_render->swapchain = *(IDXGISwapChain**)(deviceaddr + 0xA8);
-    if (!g_render->swapchain)
+    swapchain = *(IDXGISwapChain**)(deviceaddr + 0xC8);
+    if (!swapchain)
         return;
 
     DXGI_SWAP_CHAIN_DESC swapchaindesc;
-    if (FAILED(g_render->swapchain->GetDesc(&swapchaindesc)))
+    if (FAILED(swapchain->GetDesc(&swapchaindesc)))
         return;
 
 
-    g_render->windowhandle = swapchaindesc.OutputWindow;
+    windowhandle = swapchaindesc.OutputWindow;
 
-    if (FAILED(g_render->swapchain->GetDevice(__uuidof(ID3D11Device), (void**)(&g_render->device))))
+    if (FAILED(swapchain->GetDevice(__uuidof(ID3D11Device), (void**)(&device))))
         return;
 
-    g_render->device->GetImmediateContext(&g_render->devicecontext);
+    device->GetImmediateContext(&devicecontext);
 
-    void** OriginalVTable = *(void***)(g_render->swapchain);
+    void** OriginalVTable = *(void***)(swapchain);
     constexpr size_t VTableSize = 18;
- 
+
     auto ShadowVTable = std::make_unique<void* []>(VTableSize);
     memcpy(ShadowVTable.get(), OriginalVTable, sizeof(void*) * VTableSize);
 
-    g_render->originalpresent = (presentfn)(OriginalVTable[8]);
-    ShadowVTable[8] = (void*)(present);
+    originalpresent = (presentfn)(OriginalVTable[8]);
+    ShadowVTable[8] = (void*)(&present);
 
-    g_render->originalresizebuffers = (resizebuffersfn)(OriginalVTable[13]);
-    ShadowVTable[13] = (void*)(resizebuffers);
+    originalresizebuffers = (resizebuffersfn)(OriginalVTable[13]);
+    ShadowVTable[13] = (void*)(&resizebuffers);
 
-    *(void***)(g_render->swapchain) = ShadowVTable.release();
-    g_render->originalwindowproc = (WNDPROC)(SetWindowLongPtrW(g_render->windowhandle, GWLP_WNDPROC, (LONG_PTR)(windowprochandler)));
+    *(void***)(swapchain) = ShadowVTable.release();
+    originalwindowproc = (WNDPROC)(SetWindowLongPtrW(windowhandle, GWLP_WNDPROC, (LONG_PTR)(windowprochandler)));
 }
 
-LRESULT CALLBACK render::windowprochandler(HWND hwnd, std::uint32_t msg, std::uint64_t wparam, std::int64_t lparam) {
+LRESULT CALLBACK renderer::windowprochandler(HWND hwnd, std::uint32_t msg, std::uint64_t wparam, std::int64_t lparam) {
     if (msg == WM_KEYDOWN) {
         if (wparam == VK_INSERT || wparam == VK_DELETE || wparam == VK_END) {
-            g_render->test = !g_render->test;
+            test = !test;
         }
     }
     else if (msg == WM_DPICHANGED) {
-        g_render->dpi_scale = LOWORD(wparam) / 96.0f;
+        dpi_scale = LOWORD(wparam) / 96.0f;
     }
     /*else if ( msg == WM_SIZE ) {
         std::uint32_t width = LOWORD( lparam ), height = HIWORD( lparam );
@@ -71,7 +80,7 @@ LRESULT CALLBACK render::windowprochandler(HWND hwnd, std::uint32_t msg, std::ui
         }
     }*/
 
-    if (g_render->test && ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
+    if (test && ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
         return true;
 
     switch (msg) {
@@ -90,22 +99,23 @@ LRESULT CALLBACK render::windowprochandler(HWND hwnd, std::uint32_t msg, std::ui
     case 523:
     case 524:
     case 793:
-        if (g_render->test)
+        if (test)
             return true;
         break;
     }
 
-    return CallWindowProc(g_render->originalwindowproc, hwnd, msg, wparam, lparam);
+    return CallWindowProc(originalwindowproc, hwnd, msg, wparam, lparam);
 }
 
-HRESULT WINAPI render::resizebuffers(IDXGISwapChain* InSwapChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags) {
-    if (g_render) // IF CRASH OR SMTH THEN IT MIGHT BE RELATED TO TS
-        g_render->saferelease(g_render->rendertargetview);
+HRESULT WINAPI renderer::resizebuffers(IDXGISwapChain* InSwapChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags) {
+    if (niggachain::Renderer) // IF CRASH OR SMTH THEN IT MIGHT BE RELATED TO TS
+        saferelease(rendertargetview);
 
-    return g_render->originalresizebuffers(InSwapChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
+    return originalresizebuffers(InSwapChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
 }
 
-bool render::initializeimgui() {
+
+bool renderer::initializeimgui() {
     ImGui::CreateContext();
     ImGuiIO& IO = ImGui::GetIO();
     IO.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
@@ -135,21 +145,21 @@ bool render::initializeimgui() {
 
     ImGui_ImplWin32_Init(windowhandle);
     ImGui_ImplDX11_Init(device, devicecontext);
+
     return true;
 }
 
-
-HRESULT WINAPI render::present(IDXGISwapChain* InSwapChain, UINT SyncInterval, UINT Flags) {
+HRESULT WINAPI renderer::present(IDXGISwapChain* InSwapChain, UINT SyncInterval, UINT Flags) {
     static std::once_flag InitFlag;
-    std::call_once(InitFlag, []() { if (g_render) g_render->initializeimgui(); });
+    std::call_once(InitFlag, []() { if (niggachain::Renderer) initializeimgui(); });
 
-    if (!g_render) return S_OK;
+    if (!niggachain::Renderer) return S_OK;
 
-    if (!g_render->rendertargetview) {
+    if (!rendertargetview) {
         ID3D11Texture2D* BackBuffer = nullptr;
 
         if (SUCCEEDED(InSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&BackBuffer)))) {
-            g_render->device->CreateRenderTargetView(BackBuffer, nullptr, &g_render->rendertargetview);
+            device->CreateRenderTargetView(BackBuffer, nullptr, &rendertargetview);
             BackBuffer->Release();
         }
     }
@@ -158,17 +168,15 @@ HRESULT WINAPI render::present(IDXGISwapChain* InSwapChain, UINT SyncInterval, U
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
-    //for (auto obj : Arcadia::drawing_objects) if (obj) obj->draw();
-
-    if (g_render->test) {
+    if (test) {
 
         g_user_interface->render();
 
     }
 
     ImGui::Render();
-    g_render->devicecontext->OMSetRenderTargets(1, &g_render->rendertargetview, nullptr);
+    devicecontext->OMSetRenderTargets(1, &rendertargetview, nullptr);
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
-    return g_render->originalpresent(InSwapChain, SyncInterval, Flags);
+    return originalpresent(InSwapChain, SyncInterval, Flags);
 }
