@@ -1538,6 +1538,22 @@ void lua_clonefunction(lua_State* L, int idx)
     api_incr_top(L);
 }
 
+void lua_clonecfunction(lua_State* L, int idx)
+{
+    luaC_checkGC(L);
+    luaC_threadbarrier(L);
+    StkId p = index2addr(L, idx);
+    api_check(L, iscfunction(p));
+    Closure* cl = clvalue(p);
+    Closure* newcl = luaF_newCclosure(L, cl->nupvalues, cl->env);
+    for (int i = 0; i < cl->nupvalues; ++i)
+        setobj2n(L, &newcl->c.upvals[i], &cl->c.upvals[i]);
+    newcl->c.cont = cl->c.cont;
+    newcl->c.f = cl->c.f;
+    setclvalue(L, L->top, newcl);
+    api_incr_top(L);
+}
+
 void lua_cleartable(lua_State* L, int idx)
 {
     StkId t = index2addr(L, idx);

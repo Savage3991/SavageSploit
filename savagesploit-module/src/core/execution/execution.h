@@ -5,29 +5,19 @@
 #pragma once
 #include <string>
 #include "lua.h"
-#include "Luau/Bytecode.h"
-#include "Luau/BytecodeBuilder.h"
-#include "Luau/BytecodeUtils.h"
-#include "src/rbx/engine/game.h"
-
-class bytecode_encoder_t : public Luau::BytecodeEncoder { // thx shade :P
-    inline void encode(uint32_t* data, size_t count) override {
-        for (auto i = 0; i < count;)
-        {
-            uint8_t op = LUAU_INSN_OP(data[i]);
-            const auto oplen = Luau::getOpLength((LuauOpcode)op);
-            BYTE* OpCodeLookUpTable = rbx::luau::opcode_table_lookup;
-            uint8_t new_op = op * 227;
-            new_op = OpCodeLookUpTable[new_op];
-            data[i] = (new_op) | (data[i] & ~0xff);
-            i += oplen;
-        }
-    }
-};
+#include "lapi.h"
+#include "lstate.h"
+#include "lualib.h"
 
 class execution {
 public:
     uintptr_t capabilities = 0xFFFFFFFFFFFFFFFF;
+
+    void set_capabilities(Proto *proto, uintptr_t* caps);
+
+    std::string compile(std::string);
+
+    int load_string(lua_State*, std::string, std::string);
 
     bool run_code(lua_State*, std::string);
 };

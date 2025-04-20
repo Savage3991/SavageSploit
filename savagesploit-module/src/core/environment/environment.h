@@ -7,8 +7,9 @@
 #include <lua.h>
 #include <lualib.h>
 
-class environment {
+#include <unordered_set>
 
+class environment {
 public:
     static void initialize(lua_State* L);
 
@@ -17,11 +18,12 @@ public:
     void load_http_lib(lua_State* L);
     void load_closure_lib(lua_State* L);
     void load_misc_lib(lua_State* L);
+    void load_metatable_lib(lua_State* L);
 
 
     // FUNCS FOR GAME HOOK
-    int http_get(lua_State* L);
-    int get_objects(lua_State* L);
+    static int http_get(lua_State* L);
+    static int get_objects(lua_State* L);
 };
 
 inline const auto g_environment = std::make_unique<environment>();

@@ -5,7 +5,6 @@
 #pragma once
 #include <memory>
 
-
 class user_interface {
 public:
     void render();

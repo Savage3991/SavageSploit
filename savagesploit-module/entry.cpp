@@ -1,5 +1,7 @@
 #include "entry.h"
 
+#include <future>
+
 #include "globals.h"
 #include "lstate.h"
 #include "lualib.h"
@@ -52,12 +54,14 @@ void entry_point::entry(HMODULE DllModule) {
     rbx::standard_out::printf(rbx::message_type::message_output, "hello world");
 
 #pragma region cxx exception
-    exceptions::image_base = reinterpret_cast<std::uintptr_t>(DllModule);
-    auto* Dos = reinterpret_cast<IMAGE_DOS_HEADER*>(exceptions::image_base);
-    auto* Nt = reinterpret_cast<IMAGE_NT_HEADERS*>(exceptions::image_base + Dos->e_lfanew);
-    auto* Opt = &Nt->OptionalHeader;
-    exceptions::image_size = Opt->SizeOfImage;
-    AddVectoredExceptionHandler(1, exceptions::VectoredHandlerShell);
+    if (!globals::initialized) {
+        exceptions::image_base = reinterpret_cast<std::uintptr_t>(DllModule);
+        auto* Dos = reinterpret_cast<IMAGE_DOS_HEADER*>(exceptions::image_base);
+        auto* Nt = reinterpret_cast<IMAGE_NT_HEADERS*>(exceptions::image_base + Dos->e_lfanew);
+        auto* Opt = &Nt->OptionalHeader;
+        exceptions::image_size = Opt->SizeOfImage;
+        AddVectoredExceptionHandler(1, exceptions::VectoredHandlerShell);
+    }
 #pragma endregion
 
     uintptr_t script_context = g_taskscheduler->get_script_context();
@@ -83,8 +87,11 @@ void entry_point::entry(HMODULE DllModule) {
 
     rbx::standard_out::printf(rbx::message_type::message_info, "our_state: %p", our_state);
 
-    rbx::hyperion::add_to_cfg((void*)taskscheduler::initialize_hook);
-    rbx::hyperion::add_to_cfg((void*)renderer::initialize);
+    if (!globals::initialized) {
+        rbx::hyperion::add_to_cfg((void*)taskscheduler::initialize_hook);
+        rbx::hyperion::add_to_cfg((void*)renderer::initialize);
+        rbx::hyperion::add_to_cfg((void*)environment::initialize);
+    }
 
     taskscheduler::initialize_hook();
 
@@ -92,11 +99,11 @@ void entry_point::entry(HMODULE DllModule) {
 
     g_taskscheduler->queue_script("print('hello ma niggers')");
 
-    renderer::initialize();
+    if (!globals::initialized)
+        renderer::initialize();
 
     g_taskscheduler->queue_script("printidentity()");
     g_taskscheduler->queue_script("print(identifyexecutor())");
-    g_taskscheduler->queue_script("test()");
 
 
 
@@ -130,6 +137,8 @@ void entry_point::entry(HMODULE DllModule) {
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
         case DLL_PROCESS_ATTACH:
+            globals::dll_module = hModule;
+
             entry_point e_p;
             std::thread(&entry_point::entry, &e_p, hModule).detach();
         case DLL_THREAD_ATTACH:

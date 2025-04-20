@@ -401,13 +401,13 @@ typedef struct Closure
             c_cont_enc<lua_Continuation> cont;
             c_debugname_enc<const char*> debugname;
             TValue upvals[1];
-        } c;
+        } c; // c closure :3
 
         struct
         {
             c_func_enc<struct Proto*> p;
             TValue uprefs[1];
-        } l;
+        } l; // l closure
     };
 } Closure;
 

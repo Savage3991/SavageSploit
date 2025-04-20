@@ -31,7 +31,8 @@ add_library(${PROJECT_NAME} SHARED entry.cpp
         src/core/render/render.cpp
         src/core/render/render.h
         src/core/render/user_interface/user_interface.cpp
-        src/core/render/user_interface/user_interface.h)
+        src/core/render/user_interface/user_interface.h
+        src/core/environment/libs/metatable.cpp)
 
 # DEPENDENCIES
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -40,6 +41,10 @@ target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/
 ## LUAU
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/luau")
 target_link_libraries(${PROJECT_NAME} PUBLIC Luau.Compiler Luau.Ast Luau.VM Luau.VM.Internals)
+
+## IMGUI
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/cpr")
+target_link_libraries(${PROJECT_NAME} PUBLIC cpr::cpr)
 
 ## IMGUI
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/imgui")
