@@ -29,6 +29,10 @@ namespace rbx {
             inline const uintptr_t task_defer = 0x10dd100;
         }
 
+        namespace lua_bridge {
+            inline const uintptr_t push = 0xFC65C0;
+        }
+
         namespace luau {
             inline const uintptr_t luau_execute = 0x26DB300;
             inline const uintptr_t luah_dummynode = 0x463ED28;
@@ -76,6 +80,10 @@ namespace rbx {
         inline auto get_global_state = rebase<uintptr_t(__fastcall*)(uintptr_t, uintptr_t*, uintptr_t*)>(rvas::script_context::get_global_state);
 
         inline auto task_defer = rebase<__int64(__fastcall*)(lua_State*)>(rvas::script_context::task_defer);
+    }
+
+    namespace lua_bridge {
+        inline auto push_1 = rebase<void(__fastcall*)(lua_State*, std::weak_ptr<uintptr_t>)>(rvas::lua_bridge::push);
     }
 
     namespace luau {

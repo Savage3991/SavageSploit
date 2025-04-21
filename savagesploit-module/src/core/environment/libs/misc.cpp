@@ -95,6 +95,16 @@ int getgenv(lua_State* L) {
     return 1;
 }
 
+int getcallingscript(lua_State* L) {
+
+    if (L->userdata->script.expired())
+        lua_pushnil(L);
+    else
+        rbx::lua_bridge::push_1(L, L->userdata->script);
+
+    return 1;
+}
+
 void environment::load_misc_lib(lua_State *L) {
     static const luaL_Reg misc[] = {
 
@@ -102,6 +112,8 @@ void environment::load_misc_lib(lua_State *L) {
         {"getexecutorname", identifyexecutor},
 
         {"getgenv",getgenv},
+
+        {"getcallingscript", getcallingscript},
 
         //{"test",test},
 
