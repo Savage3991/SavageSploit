@@ -108,6 +108,12 @@ int getcallingscript(lua_State* L) {
 int getrenv(lua_State *L) {
     lua_State* roblox_state = globals::roblox_state;
 
+    lua_rawcheckstack(roblox_state, 1);
+    luaC_threadbarrier(roblox_state);
+
+    lua_rawcheckstack(L, 1);
+    luaC_threadbarrier(L);
+
     lua_pushvalue(roblox_state, LUA_GLOBALSINDEX);
     lua_xmove(roblox_state, L, 1);
 
@@ -128,6 +134,7 @@ void environment::load_misc_lib(lua_State *L) {
         {"getgenv",getgenv},
 
         {"getcallingscript", getcallingscript},
+        {"getrenv",getrenv},
 
         //{"test",test},
 
