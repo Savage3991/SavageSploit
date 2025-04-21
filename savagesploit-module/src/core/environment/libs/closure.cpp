@@ -212,7 +212,6 @@ int newcclosure(lua_State* L) {
 }
 
 int hookfunction(lua_State* L) {
-
     luaL_checktype(L, 1, LUA_TFUNCTION);
     luaL_checktype(L, 2, LUA_TFUNCTION);
 
@@ -328,6 +327,8 @@ int islclosure(lua_State* L) {
     lua_pushboolean(L, lua_isLfunction(L, 1));
     return 1;
 }
+
+
 
 void environment::load_closure_lib(lua_State *L) {
     static const luaL_Reg closure[] = {
