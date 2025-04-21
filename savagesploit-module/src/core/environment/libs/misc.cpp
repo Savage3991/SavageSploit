@@ -105,6 +105,20 @@ int getcallingscript(lua_State* L) {
     return 1;
 }
 
+int getrenv(lua_State *L) {
+    lua_State* roblox_state = globals::roblox_state;
+
+    lua_pushvalue(roblox_state, LUA_GLOBALSINDEX);
+    lua_xmove(roblox_state, L, 1);
+
+    lua_rawgeti(L, LUA_REGISTRYINDEX, 2);
+    lua_setfield(L, -2, "_G");
+    lua_rawgeti(L, LUA_REGISTRYINDEX, 4);
+    lua_setfield(L, -2, "shared");
+
+    return 1;
+}
+
 void environment::load_misc_lib(lua_State *L) {
     static const luaL_Reg misc[] = {
 
