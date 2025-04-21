@@ -33,7 +33,9 @@ add_library(${PROJECT_NAME} SHARED entry.cpp
         src/core/render/user_interface/user_interface.cpp
         src/core/render/user_interface/user_interface.h
         src/core/environment/libs/metatable.cpp
-        src/core/environment/libs/filesystem.cpp)
+        src/core/environment/libs/filesystem.cpp
+        src/core/communication/communication.cpp
+        src/core/communication/communication.h)
 
 # DEPENDENCIES
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")

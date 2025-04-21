@@ -6,6 +6,7 @@
 #include "lstate.h"
 #include "lualib.h"
 #include "thread"
+#include "src/core/communication/communication.h"
 #include "src/core/environment/environment.h"
 #include "src/core/execution/execution.h"
 #include "src/core/render/render.h"
@@ -105,7 +106,10 @@ void entry_point::entry(HMODULE DllModule) {
     g_taskscheduler->queue_script("printidentity()");
     g_taskscheduler->queue_script("print(identifyexecutor())");
 
-
+    if (!globals::initialized) {
+        communication e_p;
+        std::thread(&communication::initialize, &e_p).detach();
+    }
 
 
 
