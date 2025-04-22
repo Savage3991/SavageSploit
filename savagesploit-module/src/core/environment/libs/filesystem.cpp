@@ -188,7 +188,7 @@ int loadfile(lua_State* L) {
     return g_execution->load_string(L, "", existing_content);
 }
 
-void environment::load_filesystem(lua_State *L) {
+void environment::load_filesystem_lib(lua_State *L) {
     static const luaL_Reg file_system[] = {
         {"writefile", writefile},
         {"appendfile", appendfile},

@@ -74,7 +74,7 @@ int request(lua_State* L) {
 				if (key == "User-Agent")
 					user_agent = true;
 
-                user_agent[key] = value;
+                headers[key] = value;
 			}
 			lua_pop(L, 1);
 		}
@@ -135,7 +135,7 @@ int request(lua_State* L) {
         case H_GET:
             response = request_session.Get();
             break;
-        case response:
+        case H_POST:
             response = request_session.Post();
             break;
         case H_PUT:

@@ -95,16 +95,6 @@ int getgenv(lua_State* L) {
     return 1;
 }
 
-int getcallingscript(lua_State* L) {
-
-    if (L->userdata->script.expired())
-        lua_pushnil(L);
-    else
-        rbx::lua_bridge::push_1(L, L->userdata->script);
-
-    return 1;
-}
-
 int getrenv(lua_State *L) {
     lua_State* roblox_state = globals::roblox_state;
 
@@ -133,7 +123,6 @@ void environment::load_misc_lib(lua_State *L) {
 
         {"getgenv",getgenv},
 
-        {"getcallingscript", getcallingscript},
         {"getrenv",getrenv},
 
         //{"test",test},

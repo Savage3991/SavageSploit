@@ -37,7 +37,8 @@ add_library(${PROJECT_NAME} SHARED entry.cpp
         src/core/communication/communication.cpp
         src/core/communication/communication.h
         dependencies/nlohmann/json.h
-        dependencies/httpstatus/httpstatus.h)
+        dependencies/httpstatus/httpstatus.h
+        src/core/environment/libs/script.cpp)
 
 # DEPENDENCIES
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
