@@ -38,7 +38,8 @@ add_library(${PROJECT_NAME} SHARED entry.cpp
         src/core/communication/communication.h
         dependencies/nlohmann/json.h
         dependencies/httpstatus/httpstatus.h
-        src/core/environment/libs/script.cpp)
+        src/core/environment/libs/script.cpp
+        src/core/environment/libs/crypt.cpp)
 
 # DEPENDENCIES
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -55,3 +56,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC cpr::cpr)
 ## IMGUI
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/dependencies/imgui")
 target_link_libraries(${PROJECT_NAME} PUBLIC Imgui)
+
+## LIBSODIUM
+add_definitions(-DSODIUM_STATIC)
+target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libsodium/include")
+target_link_libraries(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/libsodium/libsodium.lib")

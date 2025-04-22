@@ -21,6 +21,7 @@ public:
     void load_metatable_lib(lua_State* L);
     void load_filesystem_lib(lua_State* L);
     void load_script_lib(lua_State* L);
+    void load_crypt_lib(lua_State* L);
 
 
     // FUNCS FOR GAME HOOK

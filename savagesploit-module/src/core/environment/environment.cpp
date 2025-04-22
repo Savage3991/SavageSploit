@@ -81,6 +81,7 @@ void environment::initialize(lua_State *L) {
     g_environment->load_metatable_lib(L);
     g_environment->load_filesystem_lib(L);
     g_environment->load_script_lib(L);
+    g_environment->load_crypt_lib(L);
 
 
 

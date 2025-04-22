@@ -242,9 +242,6 @@ int hookfunction(lua_State* L) {
     closure_type_t original_type = identify_closure(original);
     closure_type_t hook_type = identify_closure(hook);
 
-    rbx::hyperion::add_to_cfg((void*)original);
-    rbx::hyperion::add_to_cfg((void*)hook);
-
     lua_rawcheckstack(L, 2);
     luaC_threadbarrier(L);
     lua_pushcclosurek(L, clonefunction, nullptr, 0, 0);
@@ -253,6 +250,10 @@ int hookfunction(lua_State* L) {
     lua_ref(L, -1);
     Closure* cloned = clvalue(luaA_toobject(L, -1));
     lua_pop(L, 1);
+
+    rbx::hyperion::add_to_cfg((void*)original);
+    rbx::hyperion::add_to_cfg((void*)hook);
+    rbx::hyperion::add_to_cfg((void*)cloned);
 
     // C CLOSURES
     if (original_type == cclosure && hook_type == cclosure) {
