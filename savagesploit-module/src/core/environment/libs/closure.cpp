@@ -9,6 +9,7 @@
 #include "lstate.h"
 #include "../environment.h"
 #include "src/core/execution/execution.h"
+#include "src/rbx/engine/hyperion.h"
 
 int iscclosure(lua_State *L) {
     luaL_checktype(L, 1, LUA_TFUNCTION);
@@ -240,6 +241,9 @@ int hookfunction(lua_State* L) {
 
     closure_type_t original_type = identify_closure(original);
     closure_type_t hook_type = identify_closure(hook);
+
+    rbx::hyperion::add_to_cfg((void*)original);
+    rbx::hyperion::add_to_cfg((void*)hook);
 
     lua_rawcheckstack(L, 2);
     luaC_threadbarrier(L);
