@@ -35,7 +35,9 @@ add_library(${PROJECT_NAME} SHARED entry.cpp
         src/core/environment/libs/metatable.cpp
         src/core/environment/libs/filesystem.cpp
         src/core/communication/communication.cpp
-        src/core/communication/communication.h)
+        src/core/communication/communication.h
+        dependencies/nlohmann/json.h
+        dependencies/httpstatus/httpstatus.h)
 
 # DEPENDENCIES
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
