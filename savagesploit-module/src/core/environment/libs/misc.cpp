@@ -13,7 +13,7 @@
 #include "src/rbx/engine/game.h"
 
 int identifyexecutor(lua_State* L) {
-    lua_pushstring(L, "SavageSploit");
+    lua_pushstring(L, "SavageSploit"); // a 
     lua_pushstring(L, "1.0");
     return 2;
 }
